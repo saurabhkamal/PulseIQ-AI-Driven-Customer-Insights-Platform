@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  /* Background */
+  --color-bg-base: #F3F2EF;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-subtle: #EAE9E4;
+
+  /* Borders */
+  --color-border: #D9D8D3;
+
+  /* Text */
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #4A4A4A;
+  --color-text-muted: #8A8A8A;
+
+  /* Brand */
+  --color-brand: #0A66C2;
+  --color-brand-hover: #004182;
+
+  /* Semantic */
+  --color-success: #2D9E6B;
+  --color-warning: #E8940A;
+  --color-danger: #CC3333;
+  --color-neutral: #6B7280;
+
+  /* AI accent */
+  --color-ai-accent: #7C3AED;
+}
+
+@theme inline {
+  --color-bg-base: var(--color-bg-base);
+  --color-bg-surface: var(--color-bg-surface);
+  --color-bg-subtle: var(--color-bg-subtle);
+  --color-border: var(--color-border);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-brand: var(--color-brand);
+  --color-brand-hover: var(--color-brand-hover);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-neutral: var(--color-neutral);
+  --color-ai-accent: var(--color-ai-accent);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-secondary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-subtle);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

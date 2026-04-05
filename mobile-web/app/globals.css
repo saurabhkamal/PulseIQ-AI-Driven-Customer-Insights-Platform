@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg-base: #F3F2EF;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-subtle: #EAE9E4;
+  --color-border: #D9D8D3;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #4A4A4A;
+  --color-text-muted: #8A8A8A;
+  --color-brand: #0A66C2;
+  --color-brand-hover: #004182;
+  --color-success: #2D9E6B;
+  --color-warning: #E8940A;
+  --color-danger: #CC3333;
+  --color-neutral: #6B7280;
+  --color-ai-accent: #7C3AED;
+  --bottom-nav-height: 64px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-secondary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  overscroll-behavior: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
