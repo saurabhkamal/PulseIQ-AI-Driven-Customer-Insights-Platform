@@ -50,9 +50,8 @@ class TrendPredictionAgent(BaseAgent):
             task_type="trend_prediction",
         )
 
-        parsed = self._parse_json(raw, fallback=[])
         results: list[TrendOutput] = []
-        for item in parsed if isinstance(parsed, list) else []:
+        for item in self._parse_json_list(raw):
             try:
                 results.append(TrendOutput(
                     title=item.get("title", ""),

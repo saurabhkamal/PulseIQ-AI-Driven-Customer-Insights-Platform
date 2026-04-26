@@ -20,8 +20,8 @@ class SentimentResultResponse(BaseModel):
     sentiment: SentimentLabel
     score: float
     confidence: float
-    product_id: str | None
-    product_name: str | None
+    product_id: str | None = None
+    product_name: str | None = None
     analyzed_at: datetime
 
     model_config = {"from_attributes": True}

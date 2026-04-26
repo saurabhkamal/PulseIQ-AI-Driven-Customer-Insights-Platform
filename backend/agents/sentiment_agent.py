@@ -58,9 +58,8 @@ class SentimentAgent(BaseAgent):
             task_type="sentiment_classification",
         )
 
-        parsed = self._parse_json(raw, fallback=[])
         results = []
-        for item in parsed if isinstance(parsed, list) else []:
+        for item in self._parse_json_list(raw):
             try:
                 results.append(SentimentOutput(
                     id=item.get("id", ""),

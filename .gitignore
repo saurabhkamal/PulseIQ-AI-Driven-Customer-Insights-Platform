@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment / secrets — never commit
+.env
+.env.local
+.env.*.local
+backend/.env
+*.env
+
+# Logs
+*.log
+backend_stdout.log
+backend_stderr.log
+nohup.out
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.turbo/
+.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.yarn/cache
+.yarn/unplugged
+.pnp.*
+
+# Coverage
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+
+# Uploads / temp
+uploads/
+tmp/
+temp/

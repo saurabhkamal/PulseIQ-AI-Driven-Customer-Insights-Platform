@@ -1,5 +1,115 @@
 # PulseIQ — Prompt Log
 
+## [2026-04-26 01:20] Session prompt
+**Prompt:** Could not reach the server. Make sure the backend is running.
+---
+
+## [2026-04-26] Session prompt (continuation)
+**Prompt:** Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened. [Session continuation after context compaction — fixes for Behavior and Trends pages empty states]
+---
+
+## [2026-04-26 01:15] Session prompt
+**Prompt:** Now, tell me why names in PgAdmin in user's table is not matching the names given in this link http://localhost:3001/users
+---
+
+## [2026-04-26 01:10] Session prompt
+**Prompt:** First give me list of sql commands to query the users table to check the users, then give me list of other sql commands that I can test to query the given tables.
+---
+
+## [2026-04-26 01:00] Session prompt
+**Prompt:** I have created the database pulseiq, now create all the required tables with enormous number of records that can be tested for demo purposes.
+---
+
+## [2026-04-26 00:55] Session prompt
+**Prompt:** I have set the new password in DATABASE_URL, but last time when my PC was working and Postgres installed tables with records were created, so this time when set the new password as I have newly installed PgAdmin, would all the records come back?
+---
+
+## [2026-04-26 00:50] Session prompt
+**Prompt:** My windows 11 is newly installed and postgres is also newly installed. So, am i missing anything over here?
+---
+
+## [2026-04-26 00:45] Session prompt
+**Prompt:** Failed to fetch error coming
+---
+
+## [2026-04-26 00:40] Session prompt
+**Prompt:** Is this correct for testing: Email: admin@democorp.com, Password: password123?
+---
+
+## [2026-04-26 00:35] Session prompt
+**Prompt:** Next step — do you want me to start the three frontend dev servers (Admin, Frontend, Mobile Web) as well? Yes, Please
+---
+
+## [2026-04-26 00:30] Session prompt
+**Prompt:** Go with option 2
+---
+
+## [2026-04-26 00:25] Session prompt
+**Prompt:** Which option is better:
+
+uv python install 3.11
+uv venv C:\Users\HP\.venvs\pulseiq --python 3.11
+C:\Users\HP\.venvs\pulseiq\Scripts\activate
+cd C:\Users\HP\Desktop\DSProjects\PulseIQ\backend
+uv pip install -r requirements.txt
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+---
+
+## [2026-04-26 00:20] Session prompt
+**Prompt:** Run the following commands:
+conda create -n pulseiq python=3.11 -y
+conda activate pulseiq
+cd C:\Users\HP\Desktop\DSProjects\PulseIQ\backend
+pip install -r requirements.txt
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+---
+
+## [2026-04-26 00:15] Session prompt
+**Prompt:** Is the environment for pulseiq is created to activate: conda activate pulseiq?
+---
+
+## [2026-04-26 00:10] Session prompt
+**Prompt:** Start from the scratch and do the following:
+
+Run each of the following in a separate terminal window:
+
+Terminal 1 — Backend
+
+conda activate pulseiq
+cd C:\Users\HP\Desktop\DSProjects\PulseIQ\backend
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+Terminal 2 — Admin Panel
+
+cd C:\Users\HP\Desktop\DSProjects\PulseIQ\admin
+npm run dev
+Terminal 3 — Frontend (Web App)
+
+cd C:\Users\HP\Desktop\DSProjects\PulseIQ\frontend
+npm run dev
+Terminal 4 — Mobile Web
+
+cd C:\Users\HP\Desktop\DSProjects\PulseIQ\mobile-web
+npm run dev
+---
+
+## [2026-04-26 00:00] Session prompt
+**Prompt:** Do the following:
+
+Terminal 1 — Backend
+conda activate pulseiq
+cd C:\Users\sharm\Desktop\DSProjects\PulseIQ\backend
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+Terminal 2 — Admin Panel
+cd C:\Users\sharm\Desktop\DSProjects\PulseIQ\admin
+npm run dev
+Terminal 3 — Frontend (Web App)
+cd C:\Users\sharm\Desktop\DSProjects\PulseIQ\frontend
+npm run dev
+Terminal 4 — Mobile Web
+cd C:\Users\sharm\Desktop\DSProjects\PulseIQ\mobile-web
+npm run dev
+---
+
 ## [2026-04-05 00:20] Session prompt
 **Prompt:** Now, I would like to know are all these covered in the build order for Frontend Development and for Backend Development [full build order list]
 ---

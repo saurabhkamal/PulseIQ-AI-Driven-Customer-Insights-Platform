@@ -15,9 +15,11 @@ from repositories.trends import TrendRepository
 from repositories.insights import InsightRepository
 from models.trend import TrendPrediction
 from models.insight import Insight
+from models.sentiment import SentimentResult
 from .behavior_agent import BehaviorAnalysisAgent
 from .trend_agent import TrendPredictionAgent
 from .recommendation_agent import RecommendationAgent
+from .sentiment_agent import SentimentAgent
 
 logger = get_logger(__name__)
 
@@ -37,13 +39,40 @@ class Orchestrator:
         logger.info("orchestrator_started", org_id=self.org_id, job_id=job_id)
         await self._update_job(job_id, "processing", 0)
 
+        from datetime import timedelta
+        from repositories.base import BaseRepository
+
         try:
-            # ── Step 1: Behavior Analysis ──────────────────────────────
-            analytics_repo = AnalyticsRepository(self.session)
             now = datetime.now(timezone.utc)
-            from datetime import timedelta
             start = now - timedelta(days=30)
 
+            # ── Step 0: Sentiment Analysis ─────────────────────────────
+            sentiment_repo = SentimentRepository(self.session)
+            unanalyzed = await sentiment_repo.get_unanalyzed_feedback(self.org_id, limit=100)
+            sentiment_count = 0
+            if unanalyzed:
+                sentiment_agent = SentimentAgent(self.org_id)
+                for i in range(0, len(unanalyzed), 50):
+                    batch = unanalyzed[i: i + 50]
+                    results = await sentiment_agent.run(batch)
+                    for r in results:
+                        await BaseRepository(SentimentResult, self.session).create(
+                            SentimentResult(
+                                organization_id=self.org_id,
+                                feedback_id=r.id,
+                                sentiment=r.sentiment,
+                                score=r.score,
+                                confidence=r.confidence,
+                                model_used="gpt-4o-mini",
+                                analyzed_at=now,
+                            )
+                        )
+                    sentiment_count += len(results)
+            await self._update_job(job_id, "processing", 20)
+            logger.info("sentiment_step_done", org_id=self.org_id, classified=sentiment_count)
+
+            # ── Step 1: Behavior Analysis ──────────────────────────────
+            analytics_repo = AnalyticsRepository(self.session)
             funnel = await analytics_repo.get_funnel(self.org_id, start, now)
             top_products = await analytics_repo.get_top_products(self.org_id, start, now)
 
@@ -55,7 +84,7 @@ class Orchestrator:
                 top_products=top_products,
                 cohort_summary=[],
             )
-            await self._update_job(job_id, "processing", 33)
+            await self._update_job(job_id, "processing", 50)
 
             # ── Step 2: Trend Prediction ────────────────────────────────
             trend_agent = TrendPredictionAgent(self.org_id)
@@ -68,28 +97,24 @@ class Orchestrator:
                 max_trends=5,
             )
 
-            # Persist trends
-            trend_repo = TrendRepository(self.session)
             for t in trend_outputs:
-                from repositories.base import BaseRepository
-                trend = TrendPrediction(
-                    organization_id=self.org_id,
-                    title=t.title,
-                    description=t.description,
-                    category=t.category,
-                    confidence=t.confidence,
-                    signal_strength=t.signal_strength,
-                    supporting_data={},
-                    model_used="gpt-4o",
-                    horizon_days=t.horizon_days,
-                    generated_at=now,
+                await BaseRepository(TrendPrediction, self.session).create(
+                    TrendPrediction(
+                        organization_id=self.org_id,
+                        title=t.title,
+                        description=t.description,
+                        category=t.category,
+                        confidence=t.confidence,
+                        signal_strength=t.signal_strength,
+                        supporting_data={},
+                        model_used="gpt-4o",
+                        horizon_days=t.horizon_days,
+                        generated_at=now,
+                    )
                 )
-                await BaseRepository(TrendPrediction, self.session).create(trend)
-
-            await self._update_job(job_id, "processing", 66)
+            await self._update_job(job_id, "processing", 75)
 
             # ── Step 3: Recommendations ────────────────────────────────
-            sentiment_repo = SentimentRepository(self.session)
             sentiment_summary = await sentiment_repo.get_summary(self.org_id)
 
             rec_agent = RecommendationAgent(self.org_id)
@@ -102,29 +127,32 @@ class Orchestrator:
                 negative_pct=sentiment_summary.get("negative_pct", 0),
             )
 
-            # Persist recommendations as insights
-            insight_repo = InsightRepository(self.session)
-            from repositories.base import BaseRepository
             for r in rec_outputs:
-                insight = Insight(
-                    organization_id=self.org_id,
-                    type=r.type,
-                    priority=r.priority,
-                    title=r.title,
-                    description=r.description,
-                    supporting_data=r.supporting_data,
-                    source_agent="recommendation_agent",
-                    model_used="gpt-4o",
-                    generated_at=now,
+                await BaseRepository(Insight, self.session).create(
+                    Insight(
+                        organization_id=self.org_id,
+                        type=r.type,
+                        priority=r.priority,
+                        title=r.title,
+                        description=r.description,
+                        supporting_data=r.supporting_data,
+                        source_agent="recommendation_agent",
+                        model_used="gpt-4o",
+                        generated_at=now,
+                    )
                 )
-                await BaseRepository(Insight, self.session).create(insight)
 
-            # Invalidate insight cache
+            # Invalidate insight + sentiment caches
             await self.cache.delete(self.cache.insight_key(self.org_id, "all"))
 
             await self._update_job(job_id, "completed", 100)
             logger.info("orchestrator_completed", org_id=self.org_id, job_id=job_id)
-            return {"status": "completed", "trends": len(trend_outputs), "insights": len(rec_outputs)}
+            return {
+                "status": "completed",
+                "sentiment_classified": sentiment_count,
+                "trends": len(trend_outputs),
+                "insights": len(rec_outputs),
+            }
 
         except Exception as exc:
             logger.error("orchestrator_failed", org_id=self.org_id, job_id=job_id, error=str(exc))

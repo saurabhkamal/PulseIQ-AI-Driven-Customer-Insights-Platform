@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getAuth, clearAuth, type AuthUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -64,11 +66,28 @@ const NAV_ITEMS = [
 
 interface AdminShellProps {
   children: React.ReactNode;
-  orgName?: string;
 }
 
-export function AdminShell({ children, orgName = "Demo Corp" }: AdminShellProps) {
+export function AdminShell({ children }: AdminShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    const auth = getAuth();
+    if (!auth) {
+      router.replace("/login");
+      return;
+    }
+    setUser(auth.user);
+  }, [router]);
+
+  function handleLogout() {
+    clearAuth();
+    router.replace("/login");
+  }
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-[#F3F2EF]">
@@ -82,10 +101,17 @@ export function AdminShell({ children, orgName = "Demo Corp" }: AdminShellProps)
         </div>
         <div className="flex-1" />
         <div className="flex items-center gap-3">
-          <span className="text-[13px] text-[#8A8A8A]">{orgName}</span>
+          <span className="text-[13px] text-[#8A8A8A]">{user.name}</span>
           <div className="h-8 w-8 rounded-full bg-[#CC3333] flex items-center justify-center text-white text-[13px] font-semibold">
-            A
+            {user.name.charAt(0).toUpperCase()}
           </div>
+          <button
+            onClick={handleLogout}
+            className="text-[13px] text-[#6B7280] hover:text-[#CC3333] transition-colors"
+            title="Sign out"
+          >
+            Sign out
+          </button>
         </div>
       </header>
 

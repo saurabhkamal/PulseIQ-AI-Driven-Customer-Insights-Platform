@@ -1,11 +1,15 @@
+import asyncio
 import math
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.cache import get_cache, TTL_INSIGHT
 from core.exceptions import NotFoundError
 from core.logging import get_logger
 from repositories.insights import InsightRepository
+from models.organization import Organization
+from pipelines.enrichment import schedule_full_analysis
 from schemas.insights import InsightResponse
 from schemas.common import PaginatedResponse, PaginationMeta, JobResponse
 
@@ -52,15 +56,25 @@ class InsightsService:
         return result
 
     async def trigger_refresh(self, org_id: str) -> JobResponse:
-        """Queue a background insight generation job via the orchestrator."""
+        """Fire the full AI pipeline (sentiment → behavior → trends → recommendations)."""
         import uuid
         job_id = str(uuid.uuid4())
+
+        # Look up org name for richer agent prompts
+        result = await self.repo.session.execute(
+            select(Organization.name).where(Organization.id == org_id)
+        )
+        org_name = result.scalar_one_or_none() or org_id
+
         cache = get_cache()
         await cache.set(
             cache.pipeline_key(job_id),
             {"status": "queued", "org_id": org_id, "type": "insights_refresh"},
             ttl=3600,
         )
-        logger.info("insights_refresh_queued", job_id=job_id, org_id=org_id)
-        # The orchestrator worker picks this up asynchronously
+
+        # Fire orchestrator in the background — never blocks the HTTP response
+        asyncio.create_task(schedule_full_analysis(org_id, org_name, job_id))
+
+        logger.info("insights_refresh_started", job_id=job_id, org_id=org_id, org_name=org_name)
         return JobResponse(job_id=job_id, status="queued")

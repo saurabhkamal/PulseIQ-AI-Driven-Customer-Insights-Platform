@@ -1,3 +1,5 @@
+import traceback
+
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
@@ -60,7 +62,7 @@ async def pulseiq_exception_handler(request: Request, exc: PulseIQError) -> JSON
 
 
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    # Never leak internal details to the client
+    traceback.print_exc()
     return _error_response(
         status.HTTP_500_INTERNAL_SERVER_ERROR,
         "internal_error",

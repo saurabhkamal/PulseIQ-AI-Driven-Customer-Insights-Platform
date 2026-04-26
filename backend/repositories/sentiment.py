@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import select, func, not_, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.sentiment import SentimentResult
@@ -39,6 +39,26 @@ class SentimentRepository(BaseRepository[SentimentResult]):
             "average_score": round(avg, 3),
             "total": total,
         }
+
+    async def get_unanalyzed_feedback(
+        self, org_id: str, limit: int = 100
+    ) -> list[dict]:
+        """Return feedback items that have no sentiment result yet."""
+        result = await self.session.execute(
+            select(Feedback.id, Feedback.text)
+            .where(
+                Feedback.organization_id == org_id,
+                not_(
+                    exists(
+                        select(SentimentResult.id).where(
+                            SentimentResult.feedback_id == Feedback.id
+                        )
+                    )
+                ),
+            )
+            .limit(limit)
+        )
+        return [{"id": str(r.id), "text": r.text} for r in result.all()]
 
     async def get_by_org(
         self,

@@ -53,6 +53,28 @@ class BaseAgent(ABC):
             )
             return fallback
 
+    def _parse_json_list(self, raw: str) -> list:
+        """
+        Parse a JSON response that should be a list.
+        GPT-4o json_object mode sometimes wraps arrays in a dict
+        (e.g. {"trends": [...]}). Unwrap one level if needed.
+        """
+        parsed = self._parse_json(raw, fallback=[])
+        if isinstance(parsed, list):
+            return parsed
+        if isinstance(parsed, dict):
+            # Find the first list value in the dict
+            for v in parsed.values():
+                if isinstance(v, list):
+                    return v
+        logger.warning(
+            "agent_expected_list",
+            agent=self.name,
+            org_id=self.org_id,
+            type_received=type(parsed).__name__,
+        )
+        return []
+
     @abstractmethod
     async def run(self, **kwargs: Any) -> Any:
         """Execute the agent's core task. All args passed as keyword arguments."""

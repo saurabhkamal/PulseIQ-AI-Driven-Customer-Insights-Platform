@@ -25,9 +25,12 @@ class ApiClient {
 
   private async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
     const { params, ...fetchOptions } = options;
+    const { getToken } = await import("./auth");
+    const token = getToken();
+    const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
     const response = await fetch(this.buildUrl(path, params), {
       ...fetchOptions,
-      headers: { "Content-Type": "application/json", ...fetchOptions.headers },
+      headers: { "Content-Type": "application/json", ...authHeader, ...fetchOptions.headers },
       credentials: "include",
     });
 

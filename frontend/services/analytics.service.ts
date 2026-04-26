@@ -33,16 +33,48 @@ export interface HeatmapData {
   maxValue: number;
 }
 
+// Raw shapes returned by the backend
+interface RawFunnelStage {
+  stage: string;
+  count: number;
+  drop_off_pct: number;
+}
+
+interface RawBehaviorResponse {
+  funnel: RawFunnelStage[];
+}
+
+interface RawCohortResponse {
+  data: { cohort: string; size: number; retention: number[] }[];
+}
+
 export const analyticsService = {
-  getFunnelData(): Promise<FunnelData> {
-    return apiClient.get<FunnelData>("/analytics/behavior/funnel");
+  async getFunnelData(): Promise<FunnelData> {
+    const raw = await apiClient.get<RawBehaviorResponse>("/analytics/behavior");
+    const stages = raw.funnel ?? [];
+    const first = stages[0]?.count ?? 0;
+    const last = stages[stages.length - 1]?.count ?? 0;
+    return {
+      steps: stages.map((s, i) => ({
+        step: s.stage.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        count: s.count,
+        conversionRate: i === 0 ? 100 : Math.max(0, 100 - s.drop_off_pct),
+      })),
+      overallConversion: first > 0 ? (last / first) * 100 : 0,
+    };
   },
 
-  getCohortData(): Promise<CohortData> {
-    return apiClient.get<CohortData>("/analytics/behavior/cohorts");
+  async getCohortData(): Promise<CohortData> {
+    const raw = await apiClient.get<RawCohortResponse>("/analytics/cohorts");
+    const rows = raw.data ?? [];
+    return {
+      weeks: rows.length > 0 ? rows[0].retention.map((_, i) => `Week ${i}`) : [],
+      rows: rows.map((r) => ({ cohort: r.cohort, size: r.size, retention: r.retention })),
+    };
   },
 
-  getHeatmapData(): Promise<HeatmapData> {
-    return apiClient.get<HeatmapData>("/analytics/behavior/heatmap");
+  // No heatmap endpoint yet — return empty data so the UI shows empty state
+  async getHeatmapData(): Promise<HeatmapData> {
+    return { cells: [], maxValue: 0 };
   },
 };

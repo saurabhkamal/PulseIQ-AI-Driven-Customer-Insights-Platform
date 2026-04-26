@@ -50,9 +50,8 @@ class RecommendationAgent(BaseAgent):
             task_type="recommendation_generation",
         )
 
-        parsed = self._parse_json(raw, fallback=[])
         results: list[RecommendationOutput] = []
-        for item in parsed if isinstance(parsed, list) else []:
+        for item in self._parse_json_list(raw):
             try:
                 results.append(RecommendationOutput(
                     type=item.get("type", "marketing"),
