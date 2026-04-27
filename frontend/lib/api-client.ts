@@ -6,8 +6,46 @@ if (!API_BASE_URL && typeof window !== "undefined") {
   console.warn("NEXT_PUBLIC_API_URL is not set");
 }
 
+const BASE_URL = API_BASE_URL ?? "http://localhost:8000/api/v1";
+
+const TOKEN_KEY   = "piq_access_token";
+const REFRESH_KEY = "piq_refresh_token";
+
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
+  _isRetry?: boolean;
+}
+
+function redirectToLogin(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_KEY);
+  localStorage.removeItem("piq_user");
+  window.location.replace("/login");
+}
+
+async function tryRefresh(): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  const refreshToken = localStorage.getItem(REFRESH_KEY);
+  if (!refreshToken) return null;
+
+  try {
+    const res = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+      credentials: "include",
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { access_token: string; refresh_token?: string };
+    localStorage.setItem(TOKEN_KEY, data.access_token);
+    if (data.refresh_token) {
+      localStorage.setItem(REFRESH_KEY, data.refresh_token);
+    }
+    return data.access_token;
+  } catch {
+    return null;
+  }
 }
 
 class ApiClient {
@@ -36,11 +74,11 @@ class ApiClient {
     path: string,
     options: RequestOptions = {}
   ): Promise<T> {
-    const { params, ...fetchOptions } = options;
+    const { params, _isRetry, ...fetchOptions } = options;
     const url = this.buildUrl(path, params);
 
     const token =
-      typeof window !== "undefined" ? localStorage.getItem("piq_access_token") : null;
+      typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
 
     const response = await fetch(url, {
       ...fetchOptions,
@@ -51,6 +89,15 @@ class ApiClient {
       },
       credentials: "include",
     });
+
+    if (response.status === 401 && !_isRetry) {
+      const newToken = await tryRefresh();
+      if (newToken) {
+        return this.request<T>(path, { ...options, _isRetry: true });
+      }
+      redirectToLogin();
+      return undefined as T;
+    }
 
     if (!response.ok) {
       let errorBody: { error?: ApiError } = {};
@@ -98,6 +145,4 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(
-  API_BASE_URL ?? "http://localhost:8000/api/v1"
-);
+export const apiClient = new ApiClient(BASE_URL);

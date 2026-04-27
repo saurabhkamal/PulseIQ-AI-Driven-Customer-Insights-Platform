@@ -7,6 +7,15 @@ import { Sidebar } from "./Sidebar";
 import { authService } from "@/services/auth.service";
 import type { User } from "@/types";
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return typeof payload.exp === "number" && payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -14,7 +23,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = authService.getUser();
-    if (!stored || !authService.getToken()) {
+    const token  = authService.getToken();
+
+    if (!stored || !token || isTokenExpired(token)) {
+      authService.logout();
       router.replace("/login");
       return;
     }

@@ -1,8 +1,9 @@
 import { apiClient } from "@/lib/api-client";
 import type { User } from "@/types";
 
-const TOKEN_KEY = "piq_access_token";
-const USER_KEY = "piq_user";
+const TOKEN_KEY   = "piq_access_token";
+const REFRESH_KEY = "piq_refresh_token";
+const USER_KEY    = "piq_user";
 
 export interface AuthTokenResponse {
   access_token: string;
@@ -56,6 +57,7 @@ export const authService = {
   logout(): void {
     if (typeof window === "undefined") return;
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
   },
 
@@ -81,6 +83,7 @@ export const authService = {
 
   _storeSession(res: AuthTokenResponse): void {
     localStorage.setItem(TOKEN_KEY, res.access_token);
+    localStorage.setItem(REFRESH_KEY, res.refresh_token);
     localStorage.setItem(USER_KEY, JSON.stringify(toUser(res.user)));
   },
 };
