@@ -414,3 +414,7 @@ In 4.1 Architecture of Technical Specifications, I want the following for Fronte
 **Prompt:** Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened. [Session continuation — pending task: update frontend/app/(app)/analytics/trends/page.tsx to wire in TrendStatsStrip, TrendScatterPlot, TrendSignalDonut, TrendConfidenceChart components]
 ---
 
+## [2026-04-27 10:00] Session prompt
+**Prompt:** Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened. [Session continuation — pending tasks: InsightsVisualizations.tsx wrapper, InsightsList.tsx redesign with impact dots and agent icons, insights/page.tsx update]
+---
+

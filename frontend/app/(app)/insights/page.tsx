@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { InsightsVisualizations } from "@/features/insights/InsightsVisualizations";
 import { InsightsList } from "@/features/insights/InsightsList";
 
 export const metadata: Metadata = {
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
 export default function InsightsPage() {
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-[24px] font-semibold text-[#1A1A1A]">AI Insights</h1>
@@ -20,7 +22,15 @@ export default function InsightsPage() {
           <span className="text-[12px] font-medium text-[#7C3AED]">GPT-4o powered</span>
         </div>
       </div>
-      <InsightsList />
+
+      {/* Stats + charts */}
+      <InsightsVisualizations />
+
+      {/* Divider */}
+      <div>
+        <h2 className="text-[18px] font-semibold text-[#1A1A1A] mb-4">All Insights</h2>
+        <InsightsList />
+      </div>
     </div>
   );
 }
