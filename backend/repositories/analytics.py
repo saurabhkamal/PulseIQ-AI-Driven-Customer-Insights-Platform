@@ -15,7 +15,11 @@ class AnalyticsRepository:
     async def get_funnel(
         self, org_id: str, start: datetime, end: datetime
     ) -> list[dict]:
-        """Return event counts per stage within the date range."""
+        """
+        Return event counts for all 5 funnel stages plus cart abandonment rate.
+        Stages: search → view → click → add_to_cart → purchase
+        Cart abandonment = remove_from_cart / add_to_cart * 100
+        """
         result = await self.session.execute(
             select(
                 ConsumerEvent.event_type,
@@ -25,21 +29,34 @@ class AnalyticsRepository:
                 ConsumerEvent.organization_id == org_id,
                 ConsumerEvent.occurred_at >= start,
                 ConsumerEvent.occurred_at <= end,
-                ConsumerEvent.event_type.in_(["view", "add_to_cart", "purchase"]),
+                ConsumerEvent.event_type.in_([
+                    "search", "view", "click",
+                    "add_to_cart", "remove_from_cart", "purchase",
+                ]),
             )
             .group_by(ConsumerEvent.event_type)
         )
         rows = {r.event_type: r.count for r in result.all()}
+
+        add_to_cart_count = rows.get("add_to_cart", 0)
+        remove_count = rows.get("remove_from_cart", 0)
+        abandonment_rate = round((remove_count / max(add_to_cart_count, 1)) * 100, 1)
+
         stages = [
-            ("view", rows.get("view", 0)),
+            ("search",      rows.get("search", 0)),
+            ("view",        rows.get("view", 0)),
+            ("click",       rows.get("click", 0)),
             ("add_to_cart", rows.get("add_to_cart", 0)),
-            ("purchase", rows.get("purchase", 0)),
+            ("purchase",    rows.get("purchase", 0)),
         ]
         funnel = []
         for i, (stage, count) in enumerate(stages):
             prev = stages[i - 1][1] if i > 0 else count
             drop_off = round((1 - count / max(prev, 1)) * 100, 1) if i > 0 else 0.0
-            funnel.append({"stage": stage, "count": count, "drop_off_pct": drop_off})
+            entry: dict = {"stage": stage, "count": count, "drop_off_pct": drop_off}
+            if stage == "add_to_cart":
+                entry["abandonment_rate"] = abandonment_rate
+            funnel.append(entry)
         return funnel
 
     async def get_top_products(

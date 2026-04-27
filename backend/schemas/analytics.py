@@ -8,6 +8,7 @@ class FunnelStage(BaseModel):
     stage: str
     count: int
     drop_off_pct: float
+    abandonment_rate: float | None = None
 
 
 class BehaviorResponse(BaseModel):

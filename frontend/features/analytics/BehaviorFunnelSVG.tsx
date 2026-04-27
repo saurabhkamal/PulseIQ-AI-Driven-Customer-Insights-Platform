@@ -9,13 +9,14 @@ interface Props {
   isLoading: boolean;
 }
 
-const W = 420;
-const STAGE_H = 54;
+const W = 460;
+const STAGE_H = 52;
 const GAP = 10;
 const CX = W / 2;
-const MAX_WIDTH = 360;
-const MIN_WIDTH = 90;
+const MAX_WIDTH = 340;
+const MIN_WIDTH = 80;
 
+// Blue → teal → green gradient across stages
 const STAGE_COLORS: [string, string][] = [
   ["#0A66C2", "#1878D4"],
   ["#1878D4", "#2485DC"],
@@ -86,6 +87,7 @@ export function BehaviorFunnelSVG({ funnelData, isLoading }: Props) {
           const y2 = y1 + STAGE_H;
           const isHov = hovered === i;
           const drop = i > 0 ? Math.round(100 - step.conversionRate) : 0;
+          const isCartStage = step.abandonmentRate !== undefined;
 
           const path = [
             `M ${CX - topW / 2} ${y1}`,
@@ -102,7 +104,7 @@ export function BehaviorFunnelSVG({ funnelData, isLoading }: Props) {
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
             >
-              {/* Shadow / glow on hover */}
+              {/* Glow on hover */}
               {isHov && (
                 <path d={path} fill={STAGE_COLORS[i % STAGE_COLORS.length][0]}
                   opacity={0.15} transform="translate(0,3)" style={{ filter: "blur(4px)" }} />
@@ -115,11 +117,9 @@ export function BehaviorFunnelSVG({ funnelData, isLoading }: Props) {
                 opacity={isHov ? 1 : 0.88}
                 style={{ transition: "opacity 0.15s" }}
               />
-
-              {/* White shimmer overlay on hover */}
               {isHov && <path d={path} fill="white" opacity={0.08} />}
 
-              {/* Step label centered */}
+              {/* Stage name */}
               <text
                 x={CX} y={y1 + STAGE_H / 2 + 1}
                 textAnchor="middle"
@@ -127,7 +127,7 @@ export function BehaviorFunnelSVG({ funnelData, isLoading }: Props) {
               >
                 {step.step}
               </text>
-              {/* Count below name */}
+              {/* User count */}
               <text
                 x={CX} y={y1 + STAGE_H / 2 + 16}
                 textAnchor="middle"
@@ -136,7 +136,7 @@ export function BehaviorFunnelSVG({ funnelData, isLoading }: Props) {
                 {step.count.toLocaleString()} users
               </text>
 
-              {/* Drop-off label on left (between stages) */}
+              {/* Drop-off % — left side */}
               {i > 0 && (
                 <text
                   x={CX - topW / 2 - 8} y={y1 + STAGE_H / 2 + 5}
@@ -147,13 +147,32 @@ export function BehaviorFunnelSVG({ funnelData, isLoading }: Props) {
                 </text>
               )}
 
-              {/* Rank number on right */}
-              <text
-                x={CX + topW / 2 + 8} y={y1 + STAGE_H / 2 + 5}
-                style={{ fontSize: "11px", fill: "#6B7280", userSelect: "none" }}
-              >
-                #{i + 1}
-              </text>
+              {/* Right side: abandonment badge for cart stage, rank for others */}
+              {isCartStage ? (
+                <g>
+                  {/* Pill background */}
+                  <rect
+                    x={CX + topW / 2 + 6}
+                    y={y1 + STAGE_H / 2 - 10}
+                    width={72} height={20} rx={10}
+                    fill="#FEF3C7" stroke="#F59E0B" strokeWidth="1"
+                  />
+                  <text
+                    x={CX + topW / 2 + 42} y={y1 + STAGE_H / 2 + 4}
+                    textAnchor="middle"
+                    style={{ fontSize: "10px", fontWeight: 700, fill: "#92400E", userSelect: "none" }}
+                  >
+                    {Math.round(step.abandonmentRate!)}% left cart
+                  </text>
+                </g>
+              ) : (
+                <text
+                  x={CX + topW / 2 + 8} y={y1 + STAGE_H / 2 + 5}
+                  style={{ fontSize: "11px", fill: "#9CA3AF", userSelect: "none" }}
+                >
+                  #{i + 1}
+                </text>
+              )}
             </g>
           );
         })}

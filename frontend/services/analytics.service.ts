@@ -4,6 +4,7 @@ export interface FunnelStep {
   step: string;
   count: number;
   conversionRate: number;
+  abandonmentRate?: number;
 }
 
 export interface CohortRow {
@@ -38,6 +39,7 @@ interface RawFunnelStage {
   stage: string;
   count: number;
   drop_off_pct: number;
+  abandonment_rate?: number;
 }
 
 interface RawBehaviorResponse {
@@ -59,6 +61,7 @@ export const analyticsService = {
         step: s.stage.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
         count: s.count,
         conversionRate: i === 0 ? 100 : Math.max(0, 100 - s.drop_off_pct),
+        ...(s.abandonment_rate !== undefined && { abandonmentRate: s.abandonment_rate }),
       })),
       overallConversion: first > 0 ? (last / first) * 100 : 0,
     };
