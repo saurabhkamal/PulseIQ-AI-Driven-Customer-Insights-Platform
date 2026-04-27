@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { FunnelChart } from "@/features/analytics/FunnelChart";
-import { CohortTable } from "@/features/analytics/CohortTable";
+import { BehaviorVisualizations } from "@/features/analytics/BehaviorVisualizations";
 import { ActivityHeatmap } from "@/features/analytics/ActivityHeatmap";
+import { CohortTable } from "@/features/analytics/CohortTable";
 
 export const metadata: Metadata = {
   title: "Behavior Analytics — PulseIQ",
@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 export default function BehaviorPage() {
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div>
         <h1 className="text-[24px] font-semibold text-[#1A1A1A]">Behavior Analytics</h1>
         <p className="text-[14px] text-[#8A8A8A] mt-1">
@@ -17,14 +18,19 @@ export default function BehaviorPage() {
         </p>
       </div>
 
-      {/* Funnel + Heatmap row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <FunnelChart />
-        <ActivityHeatmap />
-      </div>
+      {/* Stats strip + SVG funnel + retention curve */}
+      <BehaviorVisualizations />
 
-      {/* Cohort table full width */}
-      <CohortTable />
+      {/* Activity heatmap */}
+      <ActivityHeatmap />
+
+      {/* Cohort retention detail table */}
+      <div style={{ borderTop: "1px solid #D9D8D3", paddingTop: "8px" }}>
+        <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#1A1A1A", marginBottom: "16px" }}>
+          Cohort Retention Detail
+        </h2>
+        <CohortTable />
+      </div>
     </div>
   );
 }
