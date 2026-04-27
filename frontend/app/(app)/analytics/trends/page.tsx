@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TrendsList } from "@/features/analytics/TrendsList";
+import { TrendsVisualizations } from "@/features/analytics/TrendsVisualizations";
 
 export const metadata: Metadata = {
   title: "Trend Predictions — PulseIQ",
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
 export default function TrendsPage() {
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-[24px] font-semibold text-[#1A1A1A]">Trend Predictions</h1>
@@ -20,7 +22,17 @@ export default function TrendsPage() {
           <span className="text-[12px] font-medium text-[#7C3AED]">GPT-4o powered</span>
         </div>
       </div>
-      <TrendsList />
+
+      {/* Charts: stats strip, scatter + donut, confidence bar chart */}
+      <TrendsVisualizations />
+
+      {/* Divider */}
+      <div style={{ borderTop: "1px solid #D9D8D3", paddingTop: "8px" }}>
+        <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#1A1A1A", marginBottom: "16px" }}>
+          All Trend Predictions
+        </h2>
+        <TrendsList />
+      </div>
     </div>
   );
 }

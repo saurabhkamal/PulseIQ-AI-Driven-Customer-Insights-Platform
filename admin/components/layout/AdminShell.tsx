@@ -79,6 +79,19 @@ export function AdminShell({ children }: AdminShellProps) {
       router.replace("/login");
       return;
     }
+    // Check JWT expiry without a library — decode the payload and compare exp
+    try {
+      const payload = JSON.parse(atob(auth.access_token.split(".")[1]));
+      if (payload.exp && Date.now() / 1000 > payload.exp) {
+        clearAuth();
+        router.replace("/login");
+        return;
+      }
+    } catch {
+      clearAuth();
+      router.replace("/login");
+      return;
+    }
     setUser(auth.user);
   }, [router]);
 

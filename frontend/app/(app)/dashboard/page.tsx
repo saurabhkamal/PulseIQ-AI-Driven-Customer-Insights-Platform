@@ -3,6 +3,7 @@ import { KpiGrid } from "@/features/dashboard/KpiGrid";
 import { InsightsSummaryCard } from "@/features/dashboard/InsightsSummaryCard";
 import { SentimentSummaryCard } from "@/features/dashboard/SentimentSummaryCard";
 import { TopTrendsCard } from "@/features/dashboard/TopTrendsCard";
+import { AIPipelineCard } from "@/features/dashboard/AIPipelineCard";
 
 export const metadata: Metadata = {
   title: "Dashboard — PulseIQ",
@@ -21,6 +22,9 @@ export default function DashboardPage() {
 
       {/* KPI metrics row */}
       <KpiGrid />
+
+      {/* AI Agent Pipeline */}
+      <AIPipelineCard />
 
       {/* Lower grid: insights + sentiment + trends */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

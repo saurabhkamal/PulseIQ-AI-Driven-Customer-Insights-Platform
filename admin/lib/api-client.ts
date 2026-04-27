@@ -25,7 +25,7 @@ class ApiClient {
 
   private async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
     const { params, ...fetchOptions } = options;
-    const { getToken } = await import("./auth");
+    const { getToken, clearAuth } = await import("./auth");
     const token = getToken();
     const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
     const response = await fetch(this.buildUrl(path, params), {
@@ -33,6 +33,12 @@ class ApiClient {
       headers: { "Content-Type": "application/json", ...authHeader, ...fetchOptions.headers },
       credentials: "include",
     });
+
+    if (response.status === 401) {
+      clearAuth();
+      if (typeof window !== "undefined") window.location.href = "/login";
+      throw { code: "401", message: "Session expired. Please log in again." };
+    }
 
     if (!response.ok) {
       let errorBody: { error?: ApiError } = {};
