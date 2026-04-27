@@ -73,8 +73,8 @@ export const analyticsService = {
     };
   },
 
-  // No heatmap endpoint yet — return empty data so the UI shows empty state
   async getHeatmapData(): Promise<HeatmapData> {
-    return { cells: [], maxValue: 0 };
+    const raw = await apiClient.get<{ cells: HeatmapCell[]; max_value: number }>("/analytics/heatmap");
+    return { cells: raw.cells ?? [], maxValue: raw.max_value ?? 0 };
   },
 };

@@ -36,10 +36,27 @@ class TrendsResponse(BaseModel):
     trends: list[TrendItem]
 
 
+class CohortRow(BaseModel):
+    cohort: str
+    size: int
+    retention: list[float]
+
+
 class CohortResponse(BaseModel):
     cohort_by: str
     metric: str
-    data: list[dict[str, Any]]
+    data: list[CohortRow]
+
+
+class HeatmapCell(BaseModel):
+    day: int
+    hour: int
+    value: int
+
+
+class HeatmapResponse(BaseModel):
+    cells: list[HeatmapCell]
+    max_value: int
 
 
 class KpiMetric(BaseModel):

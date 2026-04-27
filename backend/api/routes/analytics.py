@@ -8,7 +8,7 @@ from core.database import get_db
 from api.dependencies import AnyUser
 from services.analytics import AnalyticsService
 from services.dashboard import DashboardService
-from schemas.analytics import BehaviorResponse, KpiMetric
+from schemas.analytics import BehaviorResponse, KpiMetric, HeatmapResponse
 from schemas.common import PaginatedResponse
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
@@ -49,3 +49,11 @@ async def get_cohorts(
     return await AnalyticsService(db).get_cohorts(
         current_user.org_id, cohort_by=cohort_by, metric=metric
     )
+
+
+@router.get("/heatmap", response_model=HeatmapResponse)
+async def get_heatmap(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    return await AnalyticsService(db).get_heatmap(current_user.org_id)

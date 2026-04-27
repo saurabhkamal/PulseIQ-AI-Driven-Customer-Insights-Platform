@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select, func, case
+from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.event import ConsumerEvent
@@ -66,6 +66,113 @@ class AnalyticsRepository:
             {"id": r.id, "name": r.name, "revenue": float(r.revenue or 0), "units": r.units}
             for r in result.all()
         ]
+
+    async def get_heatmap(
+        self, org_id: str, days: int = 90
+    ) -> list[dict]:
+        """Return event counts grouped by day-of-week (0=Mon) and hour (0-23)."""
+        since = datetime.now(timezone.utc) - timedelta(days=days)
+        sql = text("""
+            SELECT
+                CAST(((EXTRACT(DOW FROM occurred_at)::int + 6) % 7) AS INTEGER) AS day,
+                CAST(EXTRACT(HOUR FROM occurred_at) AS INTEGER)                  AS hour,
+                COUNT(*)::integer                                                 AS value
+            FROM consumer_events
+            WHERE organization_id = :org_id
+              AND occurred_at >= :since
+            GROUP BY
+                CAST(((EXTRACT(DOW FROM occurred_at)::int + 6) % 7) AS INTEGER),
+                CAST(EXTRACT(HOUR FROM occurred_at) AS INTEGER)
+            ORDER BY day, hour
+        """)
+        result = await self.session.execute(sql, {"org_id": org_id, "since": since})
+        return [{"day": int(r.day), "hour": int(r.hour), "value": int(r.value)} for r in result.mappings().all()]
+
+    async def get_cohorts(
+        self, org_id: str, max_cohorts: int = 8, max_weeks: int = 7
+    ) -> list[dict]:
+        """
+        Return cohort retention data.
+        Each row: { cohort: str, size: int, retention: [100.0, 72.5, ...] }
+        retention[0] is always 100 (week 0 = acquisition week).
+        """
+        sql = text("""
+            WITH first_activity AS (
+                SELECT
+                    customer_id,
+                    DATE_TRUNC('week', MIN(occurred_at)) AS cohort_week
+                FROM consumer_events
+                WHERE organization_id = :org_id
+                  AND customer_id IS NOT NULL
+                GROUP BY customer_id
+            ),
+            weekly_activity AS (
+                SELECT
+                    e.customer_id,
+                    fa.cohort_week,
+                    DATE_TRUNC('week', e.occurred_at) AS event_week
+                FROM consumer_events e
+                INNER JOIN first_activity fa ON e.customer_id = fa.customer_id
+                WHERE e.organization_id = :org_id
+                  AND e.customer_id IS NOT NULL
+                GROUP BY e.customer_id, fa.cohort_week, DATE_TRUNC('week', e.occurred_at)
+            ),
+            retention_raw AS (
+                SELECT
+                    cohort_week,
+                    CAST(EXTRACT(EPOCH FROM (event_week - cohort_week)) / 604800 AS INTEGER) AS week_num,
+                    COUNT(DISTINCT customer_id) AS retained
+                FROM weekly_activity
+                GROUP BY cohort_week, CAST(EXTRACT(EPOCH FROM (event_week - cohort_week)) / 604800 AS INTEGER)
+            ),
+            cohort_sizes AS (
+                SELECT cohort_week, COUNT(DISTINCT customer_id) AS cohort_size
+                FROM first_activity
+                GROUP BY cohort_week
+            ),
+            recent_cohorts AS (
+                SELECT cohort_week
+                FROM cohort_sizes
+                ORDER BY cohort_week DESC
+                LIMIT :max_cohorts
+            )
+            SELECT
+                TO_CHAR(r.cohort_week, 'YYYY-"W"IW') AS cohort,
+                cs.cohort_size                         AS size,
+                r.week_num,
+                r.retained
+            FROM retention_raw r
+            INNER JOIN cohort_sizes cs  ON cs.cohort_week = r.cohort_week
+            INNER JOIN recent_cohorts rc ON rc.cohort_week = r.cohort_week
+            WHERE r.week_num >= 0 AND r.week_num <= :max_weeks
+            ORDER BY r.cohort_week DESC, r.week_num
+        """)
+        result = await self.session.execute(
+            sql,
+            {"org_id": org_id, "max_cohorts": max_cohorts, "max_weeks": max_weeks},
+        )
+        rows = result.mappings().all()
+
+        # Pivot: group by cohort, build retention array indexed by week_num
+        cohorts: dict[str, dict] = {}
+        for r in rows:
+            key = r["cohort"]
+            if key not in cohorts:
+                cohorts[key] = {"cohort": key, "size": int(r["size"]), "slots": {}}
+            cohorts[key]["slots"][int(r["week_num"])] = int(r["retained"])
+
+        output = []
+        for c in cohorts.values():
+            size = c["size"]
+            slots: dict[int, int] = c["slots"]
+            num_weeks = max(slots.keys(), default=0) + 1
+            retention = []
+            for wi in range(num_weeks):
+                retained = slots.get(wi, 0)
+                retention.append(round((retained / size) * 100, 1) if size > 0 else 0.0)
+            output.append({"cohort": c["cohort"], "size": size, "retention": retention})
+
+        return output
 
     async def get_kpi_metrics(self, org_id: str) -> list[dict]:
         """Return key KPI metrics for the dashboard."""

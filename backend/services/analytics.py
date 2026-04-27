@@ -7,7 +7,7 @@ from core.cache import get_cache, TTL_DASHBOARD
 from core.logging import get_logger
 from repositories.analytics import AnalyticsRepository
 from repositories.trends import TrendRepository
-from schemas.analytics import BehaviorResponse, TrendsResponse, TrendItem, CohortResponse
+from schemas.analytics import BehaviorResponse, TrendsResponse, TrendItem, CohortResponse, CohortRow, HeatmapResponse, HeatmapCell
 from schemas.common import PaginatedResponse, PaginationMeta
 
 logger = get_logger(__name__)
@@ -62,6 +62,17 @@ class AnalyticsService:
     async def get_cohorts(
         self, org_id: str, cohort_by: str = "week", metric: str = "retention"
     ) -> CohortResponse:
-        # Placeholder — cohort analysis requires complex windowing queries
-        # Full implementation hooks into the BehaviorAnalysisAgent output
-        return CohortResponse(cohort_by=cohort_by, metric=metric, data=[])
+        rows = await self.analytics.get_cohorts(org_id)
+        return CohortResponse(
+            cohort_by=cohort_by,
+            metric=metric,
+            data=[CohortRow(**r) for r in rows],
+        )
+
+    async def get_heatmap(self, org_id: str) -> HeatmapResponse:
+        cells = await self.analytics.get_heatmap(org_id)
+        max_value = max((c["value"] for c in cells), default=0)
+        return HeatmapResponse(
+            cells=[HeatmapCell(**c) for c in cells],
+            max_value=max_value,
+        )
