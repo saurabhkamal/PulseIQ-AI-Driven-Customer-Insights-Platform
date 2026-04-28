@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { KpiGrid } from "@/features/dashboard/KpiGrid";
+import { SectionNavigatorStrip } from "@/features/dashboard/SectionNavigatorStrip";
+import { AIPipelineCard } from "@/features/dashboard/AIPipelineCard";
+import { PipelineArchitectureCard } from "@/features/dashboard/PipelineArchitectureCard";
 import { InsightsSummaryCard } from "@/features/dashboard/InsightsSummaryCard";
 import { SentimentSummaryCard } from "@/features/dashboard/SentimentSummaryCard";
 import { TopTrendsCard } from "@/features/dashboard/TopTrendsCard";
-import { AIPipelineCard } from "@/features/dashboard/AIPipelineCard";
 
 export const metadata: Metadata = {
   title: "Dashboard — PulseIQ",
@@ -20,13 +22,19 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* KPI metrics row */}
+      {/* Top-level KPIs */}
       <KpiGrid />
 
-      {/* AI Agent Pipeline */}
+      {/* Live snapshot across all sections */}
+      <SectionNavigatorStrip />
+
+      {/* AI Agent Pipeline — animated run control */}
       <AIPipelineCard />
 
-      {/* Lower grid: insights + sentiment + trends */}
+      {/* Pipeline architecture — sequential flow explainer */}
+      <PipelineArchitectureCard />
+
+      {/* Recent insights + sentiment + trends */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <InsightsSummaryCard />
