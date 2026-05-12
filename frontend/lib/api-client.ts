@@ -53,6 +53,14 @@ class ApiClient {
     });
 
     if (!response.ok) {
+      // Expired or invalid token — clear session and redirect to login
+      if (response.status === 401 && typeof window !== "undefined") {
+        localStorage.removeItem("piq_access_token");
+        localStorage.removeItem("piq_user");
+        window.location.href = "/login";
+        throw { code: "unauthorized", message: "Session expired. Please log in again." } as ApiError;
+      }
+
       let errorBody: { error?: ApiError } = {};
       try {
         errorBody = await response.json();

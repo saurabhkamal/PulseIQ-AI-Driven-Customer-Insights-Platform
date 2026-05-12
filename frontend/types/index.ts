@@ -96,6 +96,32 @@ export interface SentimentSummary {
   total: number;
 }
 
+// ─── Compliance ──────────────────────────────────────────────────────────────
+
+export type ComplianceSeverity = "high" | "medium" | "low" | "none";
+
+export type ComplianceSignalType =
+  | "vulnerable_customer_cluster"
+  | "complaint_spike"
+  | "poor_outcome_indicator"
+  | "consumer_duty_alert"
+  | "tcf_breach_signal"
+  | "psd2_consent_issue"
+  | "none_detected";
+
+export interface ComplianceSignal {
+  id: string;
+  signalType: ComplianceSignalType;
+  severity: ComplianceSeverity;
+  description: string;
+  affectedPopulationEstimate: string | null;
+  recommendedReviewAction: string;
+  regulatoryReference: string | null;
+  reviewed: boolean;
+  reviewedAt: string | null;
+  generatedAt: string;
+}
+
 // ─── Trends ──────────────────────────────────────────────────────────────────
 
 export type SignalStrength = "high" | "medium" | "low";

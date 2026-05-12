@@ -3,13 +3,12 @@ from typing import Any, Literal
 
 from pydantic import BaseModel
 
-InsightType = Literal["marketing", "sales", "product", "retention"]
 InsightPriority = Literal["high", "medium", "low"]
 
 
 class InsightResponse(BaseModel):
     id: str
-    type: InsightType
+    type: str  # open string — agent types exceed the original 4-value enum
     priority: InsightPriority
     title: str
     description: str

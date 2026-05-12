@@ -2,4 +2,10 @@ from .sentiment_agent import SentimentAgent
 from .behavior_agent import BehaviorAnalysisAgent
 from .trend_agent import TrendPredictionAgent
 from .recommendation_agent import RecommendationAgent
+from .churn_agent import ChurnPredictionAgent
+from .abandonment_agent import JourneyAbandonmentAgent
+from .product_affinity_agent import ProductAffinityAgent
+from .compliance_agent import ComplianceSignalAgent
+from .engagement_agent import EngagementScoringAgent
+from .cross_sell_agent import CrossSellIntelligenceAgent
 from .orchestrator import Orchestrator

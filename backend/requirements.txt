@@ -3,13 +3,13 @@ fastapi==0.115.6
 uvicorn[standard]==0.32.1
 
 # Database
-sqlalchemy[asyncio]==2.0.36
-asyncpg==0.30.0
+sqlalchemy[asyncio]>=2.0.36
+asyncpg==0.31.0
 alembic==1.14.0
 
 # Validation & settings
-pydantic==2.10.3
-pydantic-settings==2.6.1
+pydantic>=2.10.3
+pydantic-settings>=2.6.1
 email-validator==2.2.0
 
 # Auth
@@ -23,8 +23,13 @@ httpx==0.28.1
 # File uploads
 python-multipart==0.0.18
 
-# OpenAI
-openai==1.57.2
+# OpenAI (upgraded to 2.x by langchain-openai dependency)
+openai>=2.26.0
+
+# LangGraph / LangChain (conversational analyst)
+langgraph>=0.2.0
+langchain-openai>=0.2.0
+langchain-core>=0.3.0
 
 # Redis / ElastiCache
 redis[hiredis]==5.2.1

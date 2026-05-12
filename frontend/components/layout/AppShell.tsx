@@ -14,7 +14,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = authService.getUser();
-    if (!stored || !authService.getToken()) {
+    const token = authService.getToken();
+    if (!stored || !token) {
+      router.replace("/login");
+      return;
+    }
+    // Decode JWT exp claim — JWT uses base64url (replaces + with -, / with _,
+    // strips = padding). Convert to standard base64 before calling atob.
+    try {
+      const b64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      const padded = b64.padEnd(b64.length + (4 - (b64.length % 4)) % 4, "=");
+      const payload = JSON.parse(atob(padded)) as { exp?: number };
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        authService.logout();
+        router.replace("/login");
+        return;
+      }
+    } catch {
+      // Malformed token — clear and redirect
+      authService.logout();
       router.replace("/login");
       return;
     }

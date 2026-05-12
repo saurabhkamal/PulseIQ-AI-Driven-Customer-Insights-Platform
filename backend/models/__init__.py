@@ -13,6 +13,11 @@ from .insight import Insight
 from .dashboard import Dashboard
 from .mobile import DeviceToken, MobileNotification, MobilePreference
 from .audit import AuditLog
+from .financial_product import FinancialProduct
+from .product_holding import ProductHolding
+from .kyc_session import KycSession
+from .compliance_signal import ComplianceSignal
+from .ai_audit_log import AiAuditLog
 
 __all__ = [
     "Organization", "User", "ApiKey", "DataSource",
@@ -20,4 +25,6 @@ __all__ = [
     "Feedback", "SentimentResult", "TrendPrediction", "Insight",
     "Dashboard", "DeviceToken", "MobileNotification", "MobilePreference",
     "AuditLog",
+    "FinancialProduct", "ProductHolding", "KycSession",
+    "ComplianceSignal", "AiAuditLog",
 ]

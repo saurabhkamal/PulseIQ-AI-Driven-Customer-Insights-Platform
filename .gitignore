@@ -1,0 +1,38 @@
+# Secrets — never commit
+backend/.env
+backend/.env.*
+!backend/.env.example
+admin/.env
+admin/.env.*
+!admin/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+mobile-web/.env
+mobile-web/.env.*
+!mobile-web/.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.log
+
+# Node / Next.js
+node_modules/
+.next/
+.turbo/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

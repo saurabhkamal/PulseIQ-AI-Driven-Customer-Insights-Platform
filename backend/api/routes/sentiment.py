@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
 from api.dependencies import AnyUser
 from services.sentiment import SentimentService
-from schemas.sentiment import SentimentResponse, SentimentSummary
+from schemas.sentiment import SentimentResponse, SentimentSummary, SentimentChartsData
 
 router = APIRouter(prefix="/sentiment", tags=["sentiment"])
 
@@ -35,3 +35,11 @@ async def get_sentiment_summary(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> SentimentSummary:
     return await SentimentService(db).get_summary(current_user.org_id)
+
+
+@router.get("/charts", response_model=SentimentChartsData)
+async def get_sentiment_charts(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> SentimentChartsData:
+    return await SentimentService(db).get_charts_data(current_user.org_id)
