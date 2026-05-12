@@ -25,7 +25,8 @@ class TrendItem(BaseModel):
     confidence: float
     category: str | None
     signal_strength: str
-    predicted_at: datetime
+    horizon_days: int | None = None
+    generated_at: datetime
 
     model_config = {"from_attributes": True}
 

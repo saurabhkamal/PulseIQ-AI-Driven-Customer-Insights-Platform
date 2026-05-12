@@ -19,7 +19,7 @@ class MobileService:
     async def register_device(
         self, user_id: str, org_id: str, req: DeviceTokenRequest
     ) -> DeviceTokenResponse:
-        existing = await self.tokens.get_by_user_and_endpoint(user_id, req.endpoint)
+        existing = await self.tokens.get_by_user_and_endpoint(user_id, req.endpoint, org_id)
         if existing:
             existing.p256dh_key = req.keys.get("p256dh", "")
             existing.auth_key = req.keys.get("auth", "")
@@ -40,8 +40,8 @@ class MobileService:
         logger.info("device_registered", user_id=user_id, org_id=org_id)
         return DeviceTokenResponse(id=token.id, registered_at=token.created_at)
 
-    async def get_notifications(self, user_id: str) -> list[NotificationResponse]:
-        rows, _ = await self.notifications.get_by_user(user_id, limit=50)
+    async def get_notifications(self, user_id: str, org_id: str) -> list[NotificationResponse]:
+        rows, _ = await self.notifications.get_by_user(user_id, org_id, limit=50)
         return [NotificationResponse.model_validate(r) for r in rows]
 
     async def mark_notification_read(self, notification_id: str, user_id: str) -> None:

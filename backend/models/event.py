@@ -1,17 +1,11 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, String
+from sqlalchemy import DateTime, ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from core.database import Base
 from .base import new_uuid
-
-EventTypeEnum = Enum(
-    "view", "click", "add_to_cart", "remove_from_cart",
-    "purchase", "review", "search", "other",
-    name="event_type",
-)
 
 
 class ConsumerEvent(Base):
@@ -30,7 +24,7 @@ class ConsumerEvent(Base):
     external_id: Mapped[str | None] = mapped_column(String(255))
     customer_id: Mapped[str | None] = mapped_column(UUID(as_uuid=False), ForeignKey("customers.id"))
     product_id: Mapped[str | None] = mapped_column(UUID(as_uuid=False), ForeignKey("products.id"))
-    event_type: Mapped[str] = mapped_column(EventTypeEnum, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(100), nullable=False)
     properties: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

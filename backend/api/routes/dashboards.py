@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
 from api.dependencies import AnyUser
 from services.dashboard import DashboardService
-from schemas.dashboard import DashboardCreate, DashboardUpdate, DashboardResponse
+from schemas.dashboard import DashboardCreate, DashboardUpdate, DashboardResponse, DashboardSummaryResponse
 from schemas.analytics import KpiMetric
 from schemas.common import PaginatedResponse
 
@@ -19,6 +19,14 @@ async def get_kpi_metrics(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> list[KpiMetric]:
     return await DashboardService(db).get_kpi_metrics(current_user.org_id)
+
+
+@router.get("/summary", response_model=DashboardSummaryResponse)
+async def get_dashboard_summary(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> DashboardSummaryResponse:
+    return await DashboardService(db).get_summary(current_user.org_id)
 
 
 @router.get("", response_model=PaginatedResponse[DashboardResponse])

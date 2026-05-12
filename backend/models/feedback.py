@@ -7,7 +7,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 from core.database import Base
 from .base import new_uuid
 
-FeedbackSourceEnum = Enum("website", "email", "survey", "app", "other", name="feedback_source")
+FeedbackSourceEnum = Enum(
+    "website", "email", "survey", "app",
+    "branch", "call_centre", "chatbot", "nps_survey", "social_media",
+    "other",
+    name="feedback_source",
+)
 
 
 class Feedback(Base):

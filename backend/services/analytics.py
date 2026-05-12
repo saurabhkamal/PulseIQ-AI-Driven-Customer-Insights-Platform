@@ -40,6 +40,9 @@ class AnalyticsService:
             heatmap_url=None,
         )
 
+    async def get_trends_insights(self, org_id: str) -> dict:
+        return await self.trends_repo.get_insights(org_id)
+
     async def get_trends(
         self,
         org_id: str,
@@ -59,9 +62,27 @@ class AnalyticsService:
             ),
         )
 
+    async def get_heatmap(self, org_id: str) -> dict:
+        return await self.analytics.get_heatmap(org_id)
+
+    async def get_dau_trend(self, org_id: str) -> dict:
+        rows = await self.analytics.get_dau_trend(org_id)
+        return {"days": rows}
+
+    async def get_new_vs_returning(self, org_id: str) -> dict:
+        rows = await self.analytics.get_new_vs_returning(org_id)
+        return {"days": rows}
+
+    async def get_segment_engagement(self, org_id: str) -> dict:
+        segments = await self.analytics.get_segment_engagement(org_id)
+        return {"segments": segments}
+
+    async def get_product_revenue_trend(self, org_id: str) -> dict:
+        products = await self.analytics.get_product_revenue_trend(org_id)
+        return {"products": products}
+
     async def get_cohorts(
         self, org_id: str, cohort_by: str = "week", metric: str = "retention"
     ) -> CohortResponse:
-        # Placeholder — cohort analysis requires complex windowing queries
-        # Full implementation hooks into the BehaviorAnalysisAgent output
-        return CohortResponse(cohort_by=cohort_by, metric=metric, data=[])
+        result = await self.analytics.get_cohort_retention(org_id, num_weeks=6)
+        return CohortResponse(**result)

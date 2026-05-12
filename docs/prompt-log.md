@@ -1,5 +1,31 @@
 # PulseIQ — Prompt Log
 
+## [2026-05-12 10:00] Session prompt
+**Prompt:** Go ahead with Priority Recommendations and also Honourable mentions. The visualizations should be very impressive whenever the clients logs in.
+---
+
+## [2026-05-12 00:02] Session prompt
+**Prompt:** Go ahead with these recommendations #2, #3, #8, #1, #6 for the Sentiment page. These visualizations should be impressive.
+---
+
+## [2026-05-12 00:00] Session prompt
+**Prompt:** [Session auto-resumed] Continue the Insights page visualization implementation. The backend repository `get_summary()` method is complete. Pending: service method, route, frontend types/hook, and 5 chart components (InsightPriorityDonut, InsightsByAgent, InsightPriorityAgentMatrix, InsightVolumeChart, InsightPriorityTrend).
+---
+
+## [2026-05-02 18:00] Session prompt
+**Prompt:** [Session continuation] Fix three reported issues after initial startup: (1) http://127.0.0.1:8000/docs → {"detail":"Not Found"}, (2) http://127.0.0.1:8000/ → {"detail":"Not Found"}, (3) Login at http://localhost:3000/login with admin@democorp.com / password123 returns "Failed to fetch". Continue from previous session where backend is running on port 8001, auth.py and exceptions.py were restored to production code, and frontend .env.local was created pointing to port 8001. Next step: restart frontend to pick up env vars and verify full login flow.
+---
+
+## [2026-05-02 00:00] Session prompt
+**Prompt:** Terminal 1 — Backend:
+cd C:\Users\HP\Desktop\DSProjects\PulseIQ\backend
+.venv\Scripts\activate
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+Terminal 2 — Frontend:
+cd C:\Users\HP\Desktop\DSProjects\PulseIQ\frontend
+pnpm dev
+---
+
 ## [2026-04-05 00:20] Session prompt
 **Prompt:** Now, I would like to know are all these covered in the build order for Frontend Development and for Backend Development [full build order list]
 ---
@@ -294,4 +320,52 @@ In 4.1 Architecture of Technical Specifications, I want the following for Fronte
 ## [2026-04-01] Session prompt 7
 **Prompt:** Save all the prompts in the prompt file that you have created.
 
+---
+
+## [2026-05-02 23:00] Session prompt
+**Prompt:** [Session continuation] Power the app with seed data and build the conversational AI analyst feature. Tasks: (1) Run backend/seed_data.py to populate DB with UK banking demo data, (2) Add AI Analyst nav item to frontend sidebar, (3) Create analyst service, chat component, and page.
+
+---
+
+## [2026-05-02 22:00] Session prompt
+**Prompt:** I have added the key in OPENAI_API_KEY. Now, power the app, so that I can see the records in the app when I click the dashboard, Behavior, Trends, Insights, and Sentiments. Also, I don't see conversational AI analyst feature in the app.
+
+---
+
+## [2026-05-02 21:00] Session prompt
+**Prompt:** Okay, continue with the "Next step: Run pip install langgraph langchain-openai langchain-core in the backend venv, then apply docs/migrations/001_uk_financial_sector.sql against your Supabase database.", but not with Supabase, currently go for local development. Later, in the project, I will plan for it.
+
+---
+
+## [2026-05-02 20:00] Session prompt
+**Prompt:** [Session continuation from context-compacted session] Continue building PulseIQ UK Retail Banking/Fintech repositioning. Previous work completed: event.py (String(100)), feedback.py (extended source enum), schemas/ingestion.py (ALLOWED_EVENT_TYPES validator, GBP default), analytics.py (FUNNEL_STAGES, KPI labels), insight.py (String(100)), prompts.py (all financial sector prompts + 6 new agent prompts), all 6 new agents (churn, abandonment, product_affinity, compliance, engagement, cross_sell), 4 new domain models (financial_product, product_holding, kyc_session, compliance_signal). Pending: ai_audit_log.py model, 6-layer guardrails system (backend/guardrails/), LangGraph conversational analyst (backend/analyst/), analyst API route, update agents/__init__.py and orchestrator.py, frontend label changes, DB schema docs, migration SQL.
+
+---
+
+## [2026-05-11 00:00] Session prompt
+**Prompt:** [Session continuation — auto-resumed from previous context] Continue building PulseIQ. Pending tasks: (1) Create frontend/features/compliance/ComplianceSignals.tsx — component referenced by compliance page but not yet created; (2) Add "Compliance" nav item to frontend/components/layout/Sidebar.tsx (admin/analyst roles only). Also needs backend GET /compliance/signals endpoint since none existed.
+---
+
+## [2026-05-11 16:32] Session prompt
+**Prompt:** [Session continuation — auto-resumed from previous context] Apply pending migration 002_user_mfa_and_gdpr.sql to fix login (column users.mfa_enabled does not exist). Then verify all 7 pages (Dashboard, Behaviour, Trends, Insights, AI Analyst, Sentiment, Compliance) return data from the seeded database.
+---
+
+## [2026-05-12 00:00] Session prompt
+**Prompt:** Now, create a pipeline page in which I would like show how the agents are working, how the orchestrator is routing to a specific agent for a specific task, how the agents are sequentially dependent on each other that is how each step feeds its output into later steps. It should be visually presentable so that when my clients logs in they should be very much impressed. On the dashboard and the navigation side there should be a tab to click this pipeline to view these particular visualization.
+---
+
+## [2026-05-12 00:30] Session prompt
+**Prompt:** [Session auto-resumed] Continue fixing the Cohort Retention visualization card on the Behavior page. Repository method was added in the previous session. Still pending: (1) backend/services/analytics.py — replace the stub get_cohorts() with real call to get_cohort_retention(); (2) frontend/services/analytics.service.ts — fix getCohortData() which always returns null.
+---
+
+## [2026-05-12 14:00] Session prompt
+**Prompt:** Please go ahead with Priority recommendation Best 5 for immediate impact: #1 (Priority Donut), #2 (By Agent), #3 (Priority × Agent Matrix), #6 (Volume Over Time), #7 (Priority Trend Over Time) for the Insights page.
+---
+
+## [2026-05-12 13:00] Session prompt
+**Prompt:** Okay go ahead with these for the trends page: #4 Trend Horizon Scatter Plot, #7 Emerging vs Maturing Trends, #2 Trends by Category, #1 Signal Strength Breakdown, #8 Category Confidence Rankings, #6 Trend Volume Over Time
+---
+
+## [2026-05-12 12:00] Session prompt
+**Prompt:** Here's the following I would like you to do: Ready to add immediately (data already in /analytics/behavior) 1. Top Products by Revenue Horizontal bar chart. The top_products array (with revenue and units) is already returned by the behavior endpoint — it's just not rendered anywhere. No backend changes needed. 2. Customer Journey Drop-off Waterfall A waterfall/cascade chart that shows the absolute volume lost at each funnel stage (not just percentages). More viscerally impactful than the current funnel bar chart — immediately shows where the biggest volume leaks are. Requires a small new backend query 3. Daily Active Users (DAU) Trend 30-day line chart counting distinct customer_id per day. Answers "is engagement growing or shrinking?" — a high-signal metric for fintech clients. One COUNT(DISTINCT customer_id) grouped by DATE_TRUNC('day', ...). 4. New vs. Returning Customers Stacked area or bar chart showing first-time event-generators vs. repeat customers each day. Computed from consumer_events by comparing a customer's first-ever created_at against the current period. Requires existing agent output (already persisted) 5. Segment Engagement Score Cards Mini-cards or a radar chart showing engagement index per customer segment (Students, Near-Retirement, Families, Premium). The BehaviorAnalysisAgent already produces segment-level scoring — it's in the insights table. Just needs a frontend read. Requires new aggregation 6. Product Revenue Over Time Multi-line chart showing daily revenue trend per top 3–5 products over 30 days. Uses sales_data grouped by product_id + DATE_TRUNC('day', transaction_at). Good for spotting which products are accelerating vs. declining
 ---

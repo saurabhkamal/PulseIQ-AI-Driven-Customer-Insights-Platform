@@ -14,6 +14,7 @@ from api.routes import (
     health_router, auth_router, users_router, ingestion_router,
     analytics_router, insights_router, sentiment_router,
     dashboards_router, export_router, mobile_router, admin_router,
+    analyst_router, gdpr_router, compliance_router,
 )
 
 settings = get_settings()
@@ -65,3 +66,6 @@ app.include_router(dashboards_router,prefix=PREFIX)
 app.include_router(export_router,    prefix=PREFIX)
 app.include_router(mobile_router,    prefix=PREFIX)
 app.include_router(admin_router,     prefix=PREFIX)
+app.include_router(analyst_router,   prefix=PREFIX)
+app.include_router(gdpr_router,       prefix=PREFIX)
+app.include_router(compliance_router, prefix=PREFIX)

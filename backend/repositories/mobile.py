@@ -9,9 +9,12 @@ class DeviceTokenRepository(BaseRepository[DeviceToken]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(DeviceToken, session)
 
-    async def get_by_user_and_endpoint(self, user_id: str, endpoint: str) -> DeviceToken | None:
+    async def get_by_user_and_endpoint(
+        self, user_id: str, endpoint: str, org_id: str
+    ) -> DeviceToken | None:
         result = await self.session.execute(
             select(DeviceToken).where(
+                DeviceToken.organization_id == org_id,
                 DeviceToken.user_id == user_id,
                 DeviceToken.endpoint == endpoint,
             )
@@ -33,9 +36,10 @@ class NotificationRepository(BaseRepository[MobileNotification]):
         super().__init__(MobileNotification, session)
 
     async def get_by_user(
-        self, user_id: str, offset: int = 0, limit: int = 50
+        self, user_id: str, org_id: str, offset: int = 0, limit: int = 50
     ) -> tuple[list[MobileNotification], int]:
         return await self.list(
+            MobileNotification.organization_id == org_id,
             MobileNotification.user_id == user_id,
             offset=offset,
             limit=limit,

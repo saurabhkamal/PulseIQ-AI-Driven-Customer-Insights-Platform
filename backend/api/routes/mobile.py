@@ -31,7 +31,7 @@ async def get_notifications(
     current_user: AnyUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> list[NotificationResponse]:
-    return await MobileService(db).get_notifications(current_user.user_id)
+    return await MobileService(db).get_notifications(current_user.user_id, current_user.org_id)
 
 
 @router.post("/notifications/{notification_id}/read", status_code=204)

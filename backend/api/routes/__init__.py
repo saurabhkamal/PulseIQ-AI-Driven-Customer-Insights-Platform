@@ -9,3 +9,13 @@ from .dashboards import router as dashboards_router
 from .export import router as export_router
 from .mobile import router as mobile_router
 from .admin import router as admin_router
+from .analyst import router as analyst_router
+from .gdpr import router as gdpr_router
+from .compliance import router as compliance_router
+
+__all__ = [
+    "health_router", "auth_router", "users_router", "ingestion_router",
+    "analytics_router", "insights_router", "sentiment_router",
+    "dashboards_router", "export_router", "mobile_router", "admin_router",
+    "analyst_router", "gdpr_router", "compliance_router",
+]

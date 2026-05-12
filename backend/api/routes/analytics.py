@@ -26,6 +26,14 @@ async def get_behavior(
     )
 
 
+@router.get("/trends/insights")
+async def get_trends_insights(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    return await AnalyticsService(db).get_trends_insights(current_user.org_id)
+
+
 @router.get("/trends")
 async def get_trends(
     current_user: AnyUser,
@@ -39,6 +47,14 @@ async def get_trends(
     )
 
 
+@router.get("/heatmap")
+async def get_heatmap(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    return await AnalyticsService(db).get_heatmap(current_user.org_id)
+
+
 @router.get("/cohorts")
 async def get_cohorts(
     current_user: AnyUser,
@@ -49,3 +65,35 @@ async def get_cohorts(
     return await AnalyticsService(db).get_cohorts(
         current_user.org_id, cohort_by=cohort_by, metric=metric
     )
+
+
+@router.get("/dau-trend")
+async def get_dau_trend(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    return await AnalyticsService(db).get_dau_trend(current_user.org_id)
+
+
+@router.get("/new-vs-returning")
+async def get_new_vs_returning(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    return await AnalyticsService(db).get_new_vs_returning(current_user.org_id)
+
+
+@router.get("/segment-engagement")
+async def get_segment_engagement(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    return await AnalyticsService(db).get_segment_engagement(current_user.org_id)
+
+
+@router.get("/product-revenue-trend")
+async def get_product_revenue_trend(
+    current_user: AnyUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    return await AnalyticsService(db).get_product_revenue_trend(current_user.org_id)

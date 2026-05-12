@@ -2,7 +2,7 @@ import math
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.cache import get_cache, TTL_INSIGHT
+from core.cache import get_cache, TTL_INSIGHT, TTL_DASHBOARD
 from core.exceptions import NotFoundError
 from core.logging import get_logger
 from repositories.insights import InsightRepository
@@ -21,10 +21,11 @@ class InsightsService:
         self,
         org_id: str,
         insight_type: str | None = None,
+        priority: str | None = None,
         page: int = 1,
         page_size: int = 20,
     ) -> PaginatedResponse[InsightResponse]:
-        cache_key = self.cache.insight_key(org_id, insight_type or "all")
+        cache_key = self.cache.insight_key(org_id, f"{insight_type or 'all'}:{priority or 'all'}")
         cached = await self.cache.get(cache_key)
         if cached and page == 1:
             data = [InsightResponse(**i) for i in cached["data"]]
@@ -33,7 +34,7 @@ class InsightsService:
 
         offset = (page - 1) * page_size
         rows, total = await self.repo.get_by_org(
-            org_id, insight_type=insight_type, offset=offset, limit=page_size
+            org_id, insight_type=insight_type, priority=priority, offset=offset, limit=page_size
         )
         result = PaginatedResponse(
             data=[InsightResponse.model_validate(r) for r in rows],
@@ -49,6 +50,16 @@ class InsightsService:
                 {"data": [i.model_dump(mode="json") for i in result.data], "meta": result.meta.model_dump()},
                 ttl=TTL_INSIGHT,
             )
+        return result
+
+    async def get_summary(self, org_id: str) -> dict:
+        """Return pre-aggregated insight data for dashboard visualisations."""
+        cache_key = self.cache.insight_key(org_id, "summary")
+        cached = await self.cache.get(cache_key)
+        if cached:
+            return cached
+        result = await self.repo.get_summary(org_id)
+        await self.cache.set(cache_key, result, ttl=TTL_DASHBOARD)
         return result
 
     async def trigger_refresh(self, org_id: str) -> JobResponse:
